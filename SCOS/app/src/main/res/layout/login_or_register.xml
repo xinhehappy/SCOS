@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:background="#ffffff">
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:id="@+id/rl1"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="30dp">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="登录名称："
+            android:id="@+id/login"
+            android:textSize="30dp"
+            android:textColor="#000000"/>
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/login_name"
+            android:cursorVisible="true"
+            android:layout_toRightOf="@id/login"
+            android:layout_alignParentRight="true"
+            android:textColor="#000000"
+            android:textColorHint="#aaaaaa"
+            android:hint="请输入用户名"/>
+    </RelativeLayout>
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/rl2"
+        android:layout_marginLeft="20dp"
+        android:layout_below="@id/rl1"
+        android:layout_marginTop="30dp">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="登录密码："
+            android:id="@+id/password"
+            android:textSize="30dp"
+            android:textColor="#000000"/>
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/login_password"
+            android:cursorVisible="true"
+            android:layout_alignParentRight="true"
+            android:layout_toRightOf="@id/password"
+            android:textColorHint="#aaaaaa"
+            android:textColor="#000000"
+            android:hint="请输入密码"
+            android:layout_alignParentTop="true" />
+    </RelativeLayout>
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/rl2">
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/login_bt"
+            android:text="登录"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/back_bt"
+            android:text="返回"
+            android:layout_toRightOf="@id/login_bt"/>
+
+
+    </RelativeLayout>
+
+</RelativeLayout>
