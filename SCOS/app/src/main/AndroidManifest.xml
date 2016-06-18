@@ -34,6 +34,9 @@
         <activity android:name=".LoginOrRegister">
 
         </activity>
+        <activity android:name=".FoodView">
+
+        </activity>
 
     </application>
 

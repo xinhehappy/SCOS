@@ -16,6 +16,5 @@
         android:verticalSpacing="20dp"
         android:horizontalSpacing="20dp"
         android:numColumns="2">
-
     </GridView>
 </RelativeLayout>
