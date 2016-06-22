@@ -1,6 +1,7 @@
 package es.source.code.activity;
 
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.os.Bundle;
@@ -13,6 +14,7 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -34,6 +36,7 @@ public class FoodView extends Activity{
     private int bmpW;// 动画图片宽度
     private View view1,view2,view3,view4;//各个页卡
     private ListView listView1,listView2,listView3,listView4;//各个页卡中的ListView
+    private Context context;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,37 +54,86 @@ public class FoodView extends Activity{
         view3=inflater.inflate(R.layout.lay3, null);
         view4=inflater.inflate(R.layout.lay4, null);
         listView1 = (ListView)view1.findViewById(R.id.list_view1);
-//        listView2 = (ListView)view1.findViewById(R.id.list_view1);
-//        listView3 = (ListView)view1.findViewById(R.id.list_view1);
-//        listView4 = (ListView)view1.findViewById(R.id.list_view1);
+        listView2 = (ListView)view1.findViewById(R.id.list_view2);
+        listView3 = (ListView)view1.findViewById(R.id.list_view3);
+        listView4 = (ListView)view1.findViewById(R.id.list_view4);
         views.add(view1);
         views.add(view2);
         views.add(view3);
         views.add(view4);
+        /**
+         * 为ListView添加适配器
+         */
+//        ListViewAdapter listViewAdapter = new ListViewAdapter(getBaseContext());
+//        listView1.setAdapter(listViewAdapter);
+//        listView1.setOnItemClickListener();
+
         viewPager.setAdapter(new MyViewPagerAdapter(views));
         viewPager.setCurrentItem(0);
         viewPager.setOnPageChangeListener(new MyOnPageChangeListener());
     }
+
+    /**
+     * ListView的适配器
+     */
     class ListViewAdapter extends BaseAdapter{
 
+        private  Context context;
+        /**
+         * 食物列表
+         */
+        private List<FoodItem>  mFoodItems = new ArrayList<FoodItem>();
+        private View.OnClickListener onClickListener;
+        /**
+         * 测试数据，自定义一些食物。
+         */
+        private String foodNames[] = {"苹果","香蕉","葡萄","猕猴桃","荔枝"};
+        private String foodPrices[] = {"12","13","14","15","16"};
+        public ListViewAdapter(Context con, List<FoodItem> mFoodItems, View.OnClickListener onClickListener){
+            this.context = con;
+            for(int i = 0; i < foodNames.length;i++){
+                FoodItem item = new FoodItem();
+                item.foodName = foodNames[i];
+                item.foodPrice = foodPrices[i];
+                mFoodItems.add(item);
+            }
+        }
         @Override
         public int getCount() {
-            return 0;
+            return mFoodItems.size();
         }
 
         @Override
         public Object getItem(int i) {
-            return null;
+            return mFoodItems.get(i);
         }
 
         @Override
         public long getItemId(int i) {
-            return 0;
+            return i;
         }
 
         @Override
         public View getView(int i, View view, ViewGroup viewGroup) {
-            return null;
+            if(view == null){
+                view = LayoutInflater.from(context).inflate(R.layout.food_item,null);
+            }
+             TextView name = (TextView) view.findViewById(R.id.food_name);
+             TextView price = (TextView) view.findViewById(R.id.food_price);
+            name.setText(mFoodItems.get(i).foodName);
+            price.setText(mFoodItems.get(i).foodPrice);
+
+            return view;
+        }
+        class FoodItem{
+            String foodName;
+            String foodPrice;
+        }
+        class ViewHolder{
+            TextView nameTv;
+            TextView priceTv;
+            Button orderBtn;
+            Button quitBtn;
         }
     }
     /**
@@ -97,7 +149,7 @@ public class FoodView extends Activity{
         textView1.setOnClickListener(new MyOnClickListener(0));
         textView2.setOnClickListener(new MyOnClickListener(1));
         textView3.setOnClickListener(new MyOnClickListener(2));
-        textView3.setOnClickListener(new MyOnClickListener(3));
+        textView4.setOnClickListener(new MyOnClickListener(3));
     }
 
     /**
@@ -122,6 +174,7 @@ public class FoodView extends Activity{
         private int index=0;
         public MyOnClickListener(int i){
             index=i;
+
         }
         public void onClick(View v) {
             viewPager.setCurrentItem(index);
@@ -157,6 +210,7 @@ public class FoodView extends Activity{
         public boolean isViewFromObject(View arg0, Object arg1) {
             return arg0==arg1;
         }
+
     }
 
     public class MyOnPageChangeListener implements ViewPager.OnPageChangeListener {
@@ -174,33 +228,32 @@ public class FoodView extends Activity{
         }
 
         public void onPageSelected(int arg0) {
-			/*两种方法，这个是一种，下面还有一种，显然这个比较麻烦
-			Animation animation = null;
-			switch (arg0) {
-			case 0:
-				if (currIndex == 1) {
-					animation = new TranslateAnimation(one, 0, 0, 0);
-				} else if (currIndex == 2) {
-					animation = new TranslateAnimation(two, 0, 0, 0);
-				}
-				break;
-			case 1:
-				if (currIndex == 0) {
-					animation = new TranslateAnimation(offset, one, 0, 0);
-				} else if (currIndex == 2) {
-					animation = new TranslateAnimation(two, one, 0, 0);
-				}
-				break;
-			case 2:
-				if (currIndex == 0) {
-					animation = new TranslateAnimation(offset, two, 0, 0);
-				} else if (currIndex == 1) {
-					animation = new TranslateAnimation(one, two, 0, 0);
-				}
-				break;
-
-			}
-			*/
+			//两种方法，这个是一种，下面还有一种，显然这个比较麻烦
+//			Animation animation = null;
+//			switch (arg0) {
+//			case 0:
+//				if (currIndex == 1) {
+//					animation = new TranslateAnimation(one, 0, 0, 0);
+//				} else if (currIndex == 2) {
+//					animation = new TranslateAnimation(two, 0, 0, 0);
+//				}
+//				break;
+//			case 1:
+//				if (currIndex == 0) {
+//					animation = new TranslateAnimation(offset, one, 0, 0);
+//				} else if (currIndex == 2) {
+//					animation = new TranslateAnimation(two, one, 0, 0);
+//				}
+//				break;
+//			case 2:
+//				if (currIndex == 0) {
+//					animation = new TranslateAnimation(offset, two, 0, 0);
+//				} else if (currIndex == 1) {
+//					animation = new TranslateAnimation(one, two, 0, 0);
+//				}
+//				break;
+//
+//			}
             Animation animation = new TranslateAnimation(one*currIndex, one*arg0, 0, 0);//显然这个比较简洁，只有一行代码。
             currIndex = arg0;
             animation.setFillAfter(true);// True:图片停在动画结束位置
