@@ -2,6 +2,7 @@ package es.source.code.activity;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -12,14 +13,18 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import es.source.code.model.User;
 
 /**
  * Created by adam on 2016/6/18.
  */
 public class FoodOrderView extends Activity{
+    private User user;
     /**
      * 选项卡文字
      */
@@ -49,12 +54,30 @@ public class FoodOrderView extends Activity{
      */
     private  int currentIndex = 0;
 
+    /**
+     * 未下单菜品集合
+     */
+    List<OrderedFoodItem> orderedFoodItems = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.food_order_view);
+        Intent intent = getIntent();
+        user = (User)intent.getSerializableExtra("currentuser");
+        initData();
         initTextView();
         initViewPager();
+    }
+    private void initData(){
+        orderedFoodItems = new ArrayList<>();
+        OrderedFoodItem item = null;
+        for(int i = 0; i < 10;i++){
+            item.name = i+"";
+            item.price = i;
+            item.numember = i;
+            item.comment = i+"";
+            orderedFoodItems.add(item);
+        }
     }
     private void initTextView(){
         textView1 = (TextView) findViewById(R.id.unordered_food);
@@ -73,12 +96,24 @@ public class FoodOrderView extends Activity{
         views.add(view1);
         views.add(view2);
 
+        MyListViewAdapter myListViewAdapter1 = new MyListViewAdapter(getBaseContext(),orderedFoodItems,onClickListener,1);
+        listView1.setAdapter(myListViewAdapter1);
+        MyListViewAdapter myListViewAdapter2 = new MyListViewAdapter(getBaseContext(),orderedFoodItems,null,2);
+        listView2.setAdapter(myListViewAdapter2);
+
+
         viewPager.setAdapter(new MyViewPagerAdapter(views));
         viewPager.setCurrentItem(0);
         viewPager.setOnPageChangeListener(new MyOnPageChangeListener());
 
     }
 
+    private  View.OnClickListener onClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Toast.makeText(getBaseContext(),"退点成功",Toast.LENGTH_SHORT).show();
+        }
+    };
     /**
      * 未下单已下单菜品
      */
@@ -86,7 +121,7 @@ public class FoodOrderView extends Activity{
         String name;
         int price;
         int numember;
-        int comment;//备注
+        String comment;//备注
 
     }
     public class MyListViewAdapter extends BaseAdapter{
@@ -99,10 +134,12 @@ public class FoodOrderView extends Activity{
         private View.OnClickListener onClickListener;
 
         private LayoutInflater mInflater;
-        public MyListViewAdapter(Context con, List<OrderedFoodItem> mOrderedFoodItems, View.OnClickListener onClickListener) {
+        private int flag;//如果为1，则不显示退点按钮，为2显示退点按钮。
+        public MyListViewAdapter(Context con, List<OrderedFoodItem> mOrderedFoodItems, View.OnClickListener onClickListener,int i) {
             this.context = con;
             this.mOrderedFoodItems = mOrderedFoodItems;
             this.onClickListener = onClickListener;
+            this.flag = i;
             mInflater = LayoutInflater.from(context);
         }
 
@@ -124,6 +161,34 @@ public class FoodOrderView extends Activity{
 
         @Override
         public View getView(int i, View view, ViewGroup viewGroup) {
+            ViewHolder viewHolder;
+            if(view == null){
+                view = mInflater.inflate(R.layout.ordered_food_item,null);
+                viewHolder = new ViewHolder();
+                viewHolder.nameTv = (TextView) findViewById(R.id.ordered_food_name);
+                viewHolder.priceTv = (TextView) findViewById(R.id.ordered_food_price);
+                viewHolder.numemberTv = (TextView)findViewById(R.id.ordered_food_num);
+                viewHolder.commentTv  = (TextView) findViewById(R.id.ordered_food_comment);
+                viewHolder.quitBtn = (Button) findViewById(R.id.ordered_quit);
+                if(flag == 1){
+                    viewHolder.quitBtn.setVisibility(View.GONE);
+                }
+                if(flag == 2){
+                    viewHolder.quitBtn.setVisibility(View.VISIBLE);
+                }
+                view.setTag(viewHolder);
+
+            }else {
+                viewHolder = (ViewHolder) view.getTag();
+            }
+            OrderedFoodItem item = mOrderedFoodItems.get(i);
+            if(item != null){
+                viewHolder.nameTv.setText(item.name);
+                viewHolder.priceTv.setText(item.price);
+                viewHolder.numemberTv.setText(item.numember);
+                viewHolder.commentTv.setText(item.comment);
+                viewHolder.quitBtn.setOnClickListener(this.onClickListener);
+            }
 
             return view;
         }

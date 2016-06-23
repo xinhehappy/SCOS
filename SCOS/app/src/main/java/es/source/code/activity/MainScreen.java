@@ -69,6 +69,15 @@ public class MainScreen extends Activity {
             }
             if(item.text == "点菜"){
                 Intent orderIntent = new Intent(MainScreen.this,FoodView.class);
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("currentuser",user);
+                orderIntent.putExtras(bundle);
+                MainScreen.this.startActivity(orderIntent);
+            }if(item.text == "查看订单"){
+                Intent orderIntent = new Intent(MainScreen.this,FoodOrderView.class);
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("currentuser",user);
+                orderIntent.putExtras(bundle);
                 MainScreen.this.startActivity(orderIntent);
             }
 

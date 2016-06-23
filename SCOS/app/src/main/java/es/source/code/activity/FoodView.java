@@ -2,6 +2,7 @@ package es.source.code.activity;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.os.Bundle;
@@ -27,8 +28,10 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
+import es.source.code.model.User;
+
 /**
- * Created by adam on 2016/6/18.
+ * Created by xinhe on 2016/6/18.
  */
 public class FoodView extends Activity{
     private ViewPager viewPager;//页卡内容
@@ -41,6 +44,7 @@ public class FoodView extends Activity{
     private View view1,view2,view3,view4;//各个页卡
     private ListView listView1,listView2,listView3,listView4;//各个页卡中的ListView
     private Context context;
+    private User user;
     /**
      * 食物列表
      */
@@ -68,6 +72,8 @@ public class FoodView extends Activity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.food_view);
+        Intent intent = getIntent();
+        user = (User) intent.getSerializableExtra("currentuser");
         initFood();
         InitImageView();
         InitTextView();
@@ -77,11 +83,21 @@ public class FoodView extends Activity{
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        Intent intent = new Intent(FoodView.this,FoodOrderView.class);
+        Bundle bundle = new Bundle();
         switch (item.getItemId()){
-            case R.id.ordered:
+            case R.id.ordered://已点菜品
+
+                bundle.putSerializable("currentuser",user);
+                intent.putExtras(bundle);
+                FoodView.this.startActivity(intent);
                 Toast.makeText(FoodView.this,"已点菜品",Toast.LENGTH_SHORT).show();
                 break;
-            case R.id.check_order:
+            case R.id.check_order://查看订单
+                bundle.putSerializable("currentuser",user);
+                intent.putExtras(bundle);
+                FoodView.this.startActivity(intent);
+                Toast.makeText(FoodView.this,"查看订单",Toast.LENGTH_SHORT).show();
                 break;
             case R.id.call_help:
                 break;
