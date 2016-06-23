@@ -9,10 +9,14 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -37,13 +41,72 @@ public class FoodView extends Activity{
     private View view1,view2,view3,view4;//各个页卡
     private ListView listView1,listView2,listView3,listView4;//各个页卡中的ListView
     private Context context;
+    /**
+     * 食物列表
+     */
+    private List<FoodItem>  mFoodItems = new ArrayList<FoodItem>();
+
+
+    /**
+     * 初始化食物列表
+     */
+    public void initFood(){
+        /**
+         * 测试数据，自定义一些食物。
+         */
+        String foodNames[] = {"苹果","香蕉","葡萄","猕猴桃","荔枝"};
+        String foodPrices[] = {"12","13","14","15","16"};
+        for(int i = 0; i < foodNames.length;i++){
+            FoodItem item = new FoodItem();
+            item.foodName = foodNames[i];
+            item.foodPrice = foodPrices[i];
+            mFoodItems.add(item);
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.food_view);
+        initFood();
         InitImageView();
         InitTextView();
         InitViewPager();
+
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.ordered:
+                Toast.makeText(FoodView.this,"已点菜品",Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.check_order:
+                break;
+            case R.id.call_help:
+                break;
+            default:
+                break;
+
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * ActionBar 中的菜单
+     * @param menu
+     * @return
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    class FoodItem{
+        String foodName;
+        String foodPrice;
     }
     private void InitViewPager() {
         viewPager=(ViewPager) findViewById(R.id.vPager);
@@ -54,9 +117,9 @@ public class FoodView extends Activity{
         view3=inflater.inflate(R.layout.lay3, null);
         view4=inflater.inflate(R.layout.lay4, null);
         listView1 = (ListView)view1.findViewById(R.id.list_view1);
-        listView2 = (ListView)view1.findViewById(R.id.list_view2);
-        listView3 = (ListView)view1.findViewById(R.id.list_view3);
-        listView4 = (ListView)view1.findViewById(R.id.list_view4);
+        listView2 = (ListView)view2.findViewById(R.id.list_view2);
+        listView3 = (ListView)view3.findViewById(R.id.list_view3);
+        listView4 = (ListView)view4.findViewById(R.id.list_view4);
         views.add(view1);
         views.add(view2);
         views.add(view3);
@@ -64,15 +127,41 @@ public class FoodView extends Activity{
         /**
          * 为ListView添加适配器
          */
-//        ListViewAdapter listViewAdapter = new ListViewAdapter(getBaseContext());
-//        listView1.setAdapter(listViewAdapter);
-//        listView1.setOnItemClickListener();
+
+        ListViewAdapter listViewAdapter = new ListViewAdapter(getBaseContext(),mFoodItems,onClickListener);
+        listView1.setAdapter(listViewAdapter);
+        listView1.setOnItemClickListener(onItemClickListener);
 
         viewPager.setAdapter(new MyViewPagerAdapter(views));
         viewPager.setCurrentItem(0);
         viewPager.setOnPageChangeListener(new MyOnPageChangeListener());
     }
+    private View.OnClickListener onClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            Button button = (Button) view;
+            String text = ((Button) view).getText().toString();
+            if("点菜".equals(text)){
+                button.setText("退点");
+                Toast.makeText(FoodView.this,"点菜成功",Toast.LENGTH_SHORT).show();
+                // TODO: 2016/6/23  点菜列表中添加已点菜品
 
+            }else if("退点".equals(text)){
+                button.setText("点菜");
+                Toast.makeText(FoodView.this,"退菜成功",Toast.LENGTH_SHORT).show();
+                // TODO: 2016/6/23  点菜列表中移除已点菜品
+            }
+
+        }
+    };
+    private AdapterView.OnItemClickListener onItemClickListener = new AdapterView.OnItemClickListener() {
+        @Override
+        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+            Toast.makeText(FoodView.this,"点击item",Toast.LENGTH_LONG).show();
+            // TODO: 2016/6/23 进入 菜品详情页面
+
+        }
+    };
     /**
      * ListView的适配器
      */
@@ -83,20 +172,17 @@ public class FoodView extends Activity{
          * 食物列表
          */
         private List<FoodItem>  mFoodItems = new ArrayList<FoodItem>();
+
         private View.OnClickListener onClickListener;
-        /**
-         * 测试数据，自定义一些食物。
-         */
-        private String foodNames[] = {"苹果","香蕉","葡萄","猕猴桃","荔枝"};
-        private String foodPrices[] = {"12","13","14","15","16"};
+
+        private LayoutInflater mInflater;
+
         public ListViewAdapter(Context con, List<FoodItem> mFoodItems, View.OnClickListener onClickListener){
             this.context = con;
-            for(int i = 0; i < foodNames.length;i++){
-                FoodItem item = new FoodItem();
-                item.foodName = foodNames[i];
-                item.foodPrice = foodPrices[i];
-                mFoodItems.add(item);
-            }
+            this.mFoodItems = mFoodItems;
+            this.onClickListener = onClickListener;
+            this.mInflater = LayoutInflater.from(context);
+
         }
         @Override
         public int getCount() {
@@ -115,27 +201,37 @@ public class FoodView extends Activity{
 
         @Override
         public View getView(int i, View view, ViewGroup viewGroup) {
+            ViewHolder viewHolder;
             if(view == null){
-                view = LayoutInflater.from(context).inflate(R.layout.food_item,null);
+                view = mInflater.inflate(R.layout.food_item,null);
+                viewHolder = new ViewHolder();
+                viewHolder.nameTv = (TextView)view.findViewById(R.id.food_name);
+                viewHolder.priceTv = (TextView) view.findViewById(R.id.food_price);
+                viewHolder.orderBtn = (Button)view.findViewById(R.id.order_btn);
+                view.setTag(viewHolder);
+            }else{
+                viewHolder = (ViewHolder)view.getTag();
             }
-             TextView name = (TextView) view.findViewById(R.id.food_name);
-             TextView price = (TextView) view.findViewById(R.id.food_price);
-            name.setText(mFoodItems.get(i).foodName);
-            price.setText(mFoodItems.get(i).foodPrice);
+
+            FoodItem foodItem = mFoodItems.get(i);
+            if(foodItem != null){
+                viewHolder.nameTv.setText(foodItem.foodName);
+                viewHolder.priceTv.setText(foodItem.foodPrice);
+                viewHolder.orderBtn.setTag(i);
+                viewHolder.orderBtn.setOnClickListener(this.onClickListener);
+            }
 
             return view;
         }
-        class FoodItem{
-            String foodName;
-            String foodPrice;
-        }
-        class ViewHolder{
+         class ViewHolder{
             TextView nameTv;
             TextView priceTv;
             Button orderBtn;
-            Button quitBtn;
         }
+
     }
+
+
     /**
      *  初始化导航栏标题
      */

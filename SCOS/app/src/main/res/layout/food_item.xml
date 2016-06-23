@@ -31,12 +31,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/order_btn"
+            android:focusable="false"
             android:layout_marginRight="5dp"
             android:text="点菜" />
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/quit_btn"
+            android:focusable="false"
             android:visibility="gone"
             android:text="退点" />
     </LinearLayout>

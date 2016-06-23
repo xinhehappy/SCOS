@@ -34,7 +34,10 @@
         <activity android:name=".LoginOrRegister">
 
         </activity>
-        <activity android:name=".FoodView">
+        <activity android:name="es.source.code.activity.FoodView"
+            android:theme="@android:style/Theme.Holo.Light"
+            android:label="菜单"
+            android:logo="@drawable/ic_launcher_">
 
         </activity>
 
