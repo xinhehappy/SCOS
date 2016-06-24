@@ -2,12 +2,13 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:weightSum="0">
     <LinearLayout
         android:layout_width="match_parent"
         android:orientation="horizontal"
         android:layout_height="60dp"
-        android:background="#ffffff">
+        android:background="#158684">
         <TextView
             android:id="@+id/unordered_food"
             android:layout_width="match_parent"
@@ -15,6 +16,7 @@
             android:gravity="center"
             android:layout_weight="1.0"
             android:textColor="#000000"
+            android:textSize="25dp"
             android:text="未下单菜"/>
         <TextView
             android:id="@+id/ordered_food"
@@ -23,15 +25,48 @@
             android:gravity="center"
             android:layout_weight="1.0"
             android:textColor="#000000"
+            android:textSize="25dp"
             android:text="已下单菜"/>
 
     </LinearLayout>
     <android.support.v4.view.ViewPager
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="420dp"
         android:background="#000000"
-        android:id="@+id/ordered_food_viewpager">
+        android:id="@+id/ordered_food_viewpager"
+        android:layout_weight="0.55">
 
     </android.support.v4.view.ViewPager>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#ffffff"
+            android:layout_weight="1.0"
+            android:layout_marginLeft="5dp"
+            android:textSize="20dp"
+            android:layout_gravity="center_vertical"
+            android:id="@+id/total_num"
+            android:text="菜品总数"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#ffffff"
+            android:layout_weight="1.0"
+            android:textSize="20dp"
+            android:layout_gravity="center_vertical"
+            android:id="@+id/total_money"
+            android:text="订单总价"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/submit_order"
+            android:text="提交订单"
+            android:textSize="20dp"
+            android:layout_marginRight="5dp"/>
+    </LinearLayout>
 
 </LinearLayout>

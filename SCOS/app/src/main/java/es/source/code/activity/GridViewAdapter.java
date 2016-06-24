@@ -17,6 +17,7 @@ import java.util.List;
 public class GridViewAdapter extends BaseAdapter {
     private Context context;
     private List<Item> mItems = new ArrayList<Item>();
+
     public GridViewAdapter(Context context,boolean isMenuHide){
         for(int i = 0;i<imageId.length-2;i++){
             Item object = new Item();
@@ -36,6 +37,14 @@ public class GridViewAdapter extends BaseAdapter {
             mItems.add(object);
         }
         this.context = context;
+    }
+
+    /**
+     * SCOSHelper类中调用的构造函数
+     */
+    public GridViewAdapter(Context context,List<Item> items){
+        this.context = context;
+        this.mItems = items;
     }
 
     @Override
@@ -66,9 +75,10 @@ public class GridViewAdapter extends BaseAdapter {
         return view;
     }
     public int imageId[] = {R.drawable.order,R.drawable.check,R.drawable.loginorout,R.drawable.help};
-    public String textItem[] = {"点菜","查看菜单","登录/注册","系统帮助"};
-    public class Item{
-        public String text;
-        public int resId;
-    }
+    public String textItem[] = {"点菜","查看订单","登录/注册","系统帮助"};
+//    public class Item{
+//        public Item(){}
+//        public String text;
+//        public int resId;
+//    }
 }

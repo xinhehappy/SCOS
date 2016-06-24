@@ -2,6 +2,7 @@ package es.source.code.activity;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -25,6 +26,9 @@ public class LoginOrRegister extends Activity{
     Button register = null;
     EditText userNameEt = null;
     EditText passwordEt = null;
+
+    private SharedPreferences sharedPreferences;
+    private SharedPreferences.Editor editor;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,6 +41,20 @@ public class LoginOrRegister extends Activity{
         register = (Button)findViewById(R.id.register_bt);
         userNameEt = (EditText)findViewById(R.id.login_name);
         passwordEt = (EditText)findViewById(R.id.login_password);
+
+        //判断是否有用户名记录
+        sharedPreferences = this.getSharedPreferences("userName",MODE_WORLD_READABLE);
+        editor = sharedPreferences.edit();
+        final String userNamed = sharedPreferences.getString("userName",null);
+        if(userNamed == null){
+            //无记录
+            login.setVisibility(View.GONE);
+        }
+        if(userNamed != null){
+            userNameEt.setText(userNamed);
+            register.setVisibility(View.GONE);
+
+        }
 
 
         login.setOnClickListener(new View.OnClickListener() {
@@ -52,6 +70,11 @@ public class LoginOrRegister extends Activity{
                     passwordEt.setError("输入内容不符合规则");
                     return;
                 }else{
+
+                    editor.putString("userName",userName);//用户名写入SharedPreferences
+                    editor.putInt("loginState",1);
+                    editor.commit();
+
                     User loginUser = new User();
                     loginUser.setUserName(userName);
                     loginUser.setPassword(password);
@@ -70,6 +93,9 @@ public class LoginOrRegister extends Activity{
         back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(userNamed != null){
+                    editor.putInt("loginState",0);
+                }
                 Intent intent = new Intent(LoginOrRegister.this,MainScreen.class);
                 intent.putExtra("value","Return");
                 LoginOrRegister.this.startActivity(intent);
@@ -89,6 +115,11 @@ public class LoginOrRegister extends Activity{
                     passwordEt.setError("输入内容不符合规则");
                     return;
                 }else{
+
+                    editor.putString("userName",userName);//用户名写入SharedPreferences
+                    editor.putInt("loginState",1);
+                    editor.commit();
+
                     User loginUser = new User();
                     loginUser.setUserName(userName);
                     loginUser.setPassword(password);

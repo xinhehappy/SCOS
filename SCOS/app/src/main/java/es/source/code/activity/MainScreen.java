@@ -60,8 +60,8 @@ public class MainScreen extends Activity {
     class GridViewListener implements AdapterView.OnItemClickListener{
         @Override
         public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-            GridViewAdapter.Item item ;
-            item = (GridViewAdapter.Item) adapterView.getItemAtPosition(i);
+            Item item ;
+            item = (Item) adapterView.getItemAtPosition(i);
             if(item.text == "登录/注册")
             {
                 Intent loginIntent = new Intent(MainScreen.this,LoginOrRegister.class);
@@ -79,6 +79,9 @@ public class MainScreen extends Activity {
                 bundle.putSerializable("currentuser",user);
                 orderIntent.putExtras(bundle);
                 MainScreen.this.startActivity(orderIntent);
+            }if(item.text == "系统帮助"){
+                Intent intent = new Intent(MainScreen.this,SCOSHelper.class);
+                MainScreen.this.startActivity(intent);
             }
 
         }

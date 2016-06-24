@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="es.source.code.activity"
-    android:versionCode="1"
-    android:versionName="1.0"
+    android:versionCode="2"
+    android:versionName="2.0"
     >
+    <uses-permission android:name="android.permission.CALL_PHONE"></uses-permission>
+    <uses-permission android:name="android.permission.SEND_SMS"></uses-permission>
     <permission
         android:name="scos.permission.ACCESSSCOS"
         android:protectionLevel="dangerous">
@@ -40,7 +42,18 @@
             android:logo="@drawable/ic_launcher_">
 
         </activity>
+        <activity android:name=".FoodOrderView"
+        >
 
+        </activity>
+        <activity android:name=".FoodDetailed"
+        >
+
+        </activity>
+        <activity android:name=".SCOSHelper"
+            >
+
+        </activity>
     </application>
 
 </manifest>

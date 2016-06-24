@@ -3,6 +3,7 @@ package es.source.code.activity;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -14,6 +15,8 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +32,10 @@ public class FoodOrderView extends Activity{
      * 选项卡文字
      */
     private TextView textView1 ,textView2;
+    //菜品总量
+    private TextView totalNumTv;
+    private TextView totalMoneyTv;
+    private Button submitOrderBtn;
     /**
      * ViewPager中的view
      */
@@ -70,8 +77,9 @@ public class FoodOrderView extends Activity{
     }
     private void initData(){
         orderedFoodItems = new ArrayList<>();
-        OrderedFoodItem item = null;
+        OrderedFoodItem item ;
         for(int i = 0; i < 10;i++){
+            item = new OrderedFoodItem();
             item.name = i+"";
             item.price = i;
             item.numember = i;
@@ -82,8 +90,13 @@ public class FoodOrderView extends Activity{
     private void initTextView(){
         textView1 = (TextView) findViewById(R.id.unordered_food);
         textView2 = (TextView) findViewById(R.id.ordered_food);
+        textView1.setTextColor(Color.BLUE);
         textView1.setOnClickListener(new MyOnClickListener(0));
         textView2.setOnClickListener(new MyOnClickListener(1));
+
+        totalNumTv = (TextView)findViewById(R.id.total_num);
+        totalMoneyTv = (TextView)findViewById(R.id.total_money);
+        submitOrderBtn = (Button)findViewById(R.id.submit_order);
     }
     private void initViewPager(){
         viewPager = (ViewPager) findViewById(R.id.ordered_food_viewpager);
@@ -91,14 +104,15 @@ public class FoodOrderView extends Activity{
         LayoutInflater filter = getLayoutInflater();
         view1 = filter.inflate(R.layout.lay1,null);
         view2 = filter.inflate(R.layout.lay2,null);
-        listView1 = (ListView) findViewById(R.id.list_view1);
-        listView2 = (ListView) findViewById(R.id.list_view2);
+        listView1 = (ListView) view1.findViewById(R.id.list_view1);
+        listView2 = (ListView) view2.findViewById(R.id.list_view2);
         views.add(view1);
         views.add(view2);
 
-        MyListViewAdapter myListViewAdapter1 = new MyListViewAdapter(getBaseContext(),orderedFoodItems,onClickListener,1);
-        listView1.setAdapter(myListViewAdapter1);
-        MyListViewAdapter myListViewAdapter2 = new MyListViewAdapter(getBaseContext(),orderedFoodItems,null,2);
+        MyListViewAdapter myListViewAdapter1 = new MyListViewAdapter(getBaseContext(),orderedFoodItems,onClickListener,2);
+        listView1.setAdapter(myListViewAdapter1);//未下单菜品，显示退点按钮
+
+        MyListViewAdapter myListViewAdapter2 = new MyListViewAdapter(getBaseContext(),orderedFoodItems,null,1);
         listView2.setAdapter(myListViewAdapter2);
 
 
@@ -165,11 +179,11 @@ public class FoodOrderView extends Activity{
             if(view == null){
                 view = mInflater.inflate(R.layout.ordered_food_item,null);
                 viewHolder = new ViewHolder();
-                viewHolder.nameTv = (TextView) findViewById(R.id.ordered_food_name);
-                viewHolder.priceTv = (TextView) findViewById(R.id.ordered_food_price);
-                viewHolder.numemberTv = (TextView)findViewById(R.id.ordered_food_num);
-                viewHolder.commentTv  = (TextView) findViewById(R.id.ordered_food_comment);
-                viewHolder.quitBtn = (Button) findViewById(R.id.ordered_quit);
+                viewHolder.nameTv = (TextView) view.findViewById(R.id.ordered_food_name);
+                viewHolder.priceTv = (TextView) view.findViewById(R.id.ordered_food_price);
+                viewHolder.numemberTv = (TextView)view.findViewById(R.id.ordered_food_num);
+                viewHolder.commentTv  = (TextView) view.findViewById(R.id.ordered_food_comment);
+                viewHolder.quitBtn = (Button) view.findViewById(R.id.ordered_quit);
                 if(flag == 1){
                     viewHolder.quitBtn.setVisibility(View.GONE);
                 }
@@ -184,8 +198,8 @@ public class FoodOrderView extends Activity{
             OrderedFoodItem item = mOrderedFoodItems.get(i);
             if(item != null){
                 viewHolder.nameTv.setText(item.name);
-                viewHolder.priceTv.setText(item.price);
-                viewHolder.numemberTv.setText(item.numember);
+                viewHolder.priceTv.setText(item.price+"");
+                viewHolder.numemberTv.setText(item.numember+"");
                 viewHolder.commentTv.setText(item.comment);
                 viewHolder.quitBtn.setOnClickListener(this.onClickListener);
             }
@@ -215,6 +229,15 @@ public class FoodOrderView extends Activity{
         public void onPageSelected(int position) {
             currentIndex = position;
             viewPager.setCurrentItem(currentIndex);
+            if(currentIndex == 0){
+                textView1.setTextColor(Color.BLUE);
+                textView2.setTextColor(Color.BLACK);
+                submitOrderBtn.setText("提交订单");
+            }else {
+                textView1.setTextColor(Color.BLACK);
+                textView2.setTextColor(Color.BLUE);
+                submitOrderBtn.setText("结账");
+            }
         }
     }
     public class MyViewPagerAdapter extends PagerAdapter {
@@ -252,10 +275,20 @@ public class FoodOrderView extends Activity{
         private MyOnClickListener(int i){
             index = i;
 
+
+
+
         }
         @Override
         public void onClick(View view) {
             viewPager.setCurrentItem(index);
+            if(index == 0){
+                textView1.setTextColor(Color.BLUE);
+                textView2.setTextColor(Color.BLACK);
+            }else {
+                textView1.setTextColor(Color.BLACK);
+                textView2.setTextColor(Color.BLUE);
+            }
         }
     }
 }

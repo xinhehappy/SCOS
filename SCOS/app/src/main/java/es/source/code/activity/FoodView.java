@@ -175,6 +175,11 @@ public class FoodView extends Activity{
         public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
             Toast.makeText(FoodView.this,"点击item",Toast.LENGTH_LONG).show();
             // TODO: 2016/6/23 进入 菜品详情页面
+            Intent intent = new Intent(FoodView.this,FoodDetailed.class);
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("foodsitem",mFoodItems.get(i).foodName);
+            intent.putExtras(bundle);
+            FoodView.this.startActivity(intent);
 
         }
     };

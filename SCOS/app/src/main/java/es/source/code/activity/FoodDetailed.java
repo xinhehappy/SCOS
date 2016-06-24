@@ -10,5 +10,6 @@ public class FoodDetailed extends Activity{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.food_detailed);
     }
 }
