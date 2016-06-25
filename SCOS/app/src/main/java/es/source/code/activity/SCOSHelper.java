@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.telephony.SmsManager;
 import android.view.View;
 import android.widget.AdapterView;
@@ -53,10 +55,40 @@ public class SCOSHelper extends Activity{
                 Toast.makeText(getBaseContext(),"求助短信发送成功",Toast.LENGTH_SHORT).show();
             }if(i==4){
                 //邮件帮助
+                new Thread(new MailSender()).start();
             }
 
         }
     };
+
+    private Handler handler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            if(msg.what == 1){
+                Toast.makeText(getBaseContext(),"求助邮件已发送成功",Toast.LENGTH_SHORT).show();
+            }
+        }
+    };
+
+    /**
+     * 开启一个用户线程，用来发送邮件。
+     */
+    private class MailSender implements Runnable{
+        @Override
+        public void run() {
+
+            Intent intent = new Intent(Intent.ACTION_SENDTO);
+            intent.setData(Uri.parse("mailto:691428816@qq.com"));
+            intent.putExtra(Intent.EXTRA_SUBJECT,"用户帮助");
+            intent.putExtra(Intent.EXTRA_TEXT,"邮件内容");
+            startActivity(intent);
+
+            Message msg = Message.obtain();
+            msg.what = 1;
+            handler.sendMessage(msg);
+
+        }
+    }
     private void initData(){
         for(int i = 0;i<imageId.length;i++){
             Item object = new Item();

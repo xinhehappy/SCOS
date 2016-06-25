@@ -15,6 +15,7 @@ import es.source.code.model.User;
 
 /**
  * Created by xinhe on 2016/6/11.
+ *
  */
 public class MainScreen extends Activity {
 

@@ -1,9 +1,11 @@
 package es.source.code.activity;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -65,12 +67,22 @@ public class FoodOrderView extends Activity{
      * 未下单菜品集合
      */
     List<OrderedFoodItem> orderedFoodItems = null;
+
+    private ProgressDialog dialog;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.food_order_view);
         Intent intent = getIntent();
         user = (User)intent.getSerializableExtra("currentuser");
+
+        dialog = new ProgressDialog(this);
+        dialog.setTitle("提示");
+        dialog.setMessage("正在结账，请稍后...");
+        dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        dialog.setCancelable(false);
+
+
         initData();
         initTextView();
         initViewPager();
@@ -97,6 +109,64 @@ public class FoodOrderView extends Activity{
         totalNumTv = (TextView)findViewById(R.id.total_num);
         totalMoneyTv = (TextView)findViewById(R.id.total_money);
         submitOrderBtn = (Button)findViewById(R.id.submit_order);
+        submitOrderBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(currentIndex == 0){
+                    //// TODO: 2016/6/25 提交订单操作
+                }if(currentIndex == 1){
+                    //结账操作
+                    new MyAsyncTask().execute();
+                }
+            }
+        });
+    }
+
+    /**
+     * 异步任务完成结账操作
+     */
+    private class MyAsyncTask extends AsyncTask<Void,Integer,Boolean>{
+
+        //在界面上显示进度条
+        @Override
+        protected void onPreExecute() {
+            dialog.show();
+        }
+
+
+        //主要更新UI
+        @Override
+        protected void onPostExecute(Boolean aBoolean) {
+            super.onPostExecute(aBoolean);
+            submitOrderBtn.setClickable(false);
+            dialog.dismiss();
+            Toast.makeText(getBaseContext(),"结账成功：总金额500元，并获得500积分",Toast.LENGTH_LONG).show();
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            super.onProgressUpdate(values);
+            dialog.setProgress(values[0]);
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            try{
+
+                int totalLength = 0;
+                while (totalLength <= 100){
+                    totalLength += 5;
+                    publishProgress(totalLength);
+                }
+                Thread.sleep(6000);
+
+            }catch (InterruptedException e){
+                e.printStackTrace();
+            }
+
+
+            return null;
+        }
     }
     private void initViewPager(){
         viewPager = (ViewPager) findViewById(R.id.ordered_food_viewpager);
