@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.DisplayMetrics;
@@ -29,6 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import es.source.code.model.User;
+import es.source.code.service.ServerObserverService;
 
 /**
  * Created by xinhe on 2016/6/18.
@@ -45,6 +48,7 @@ public class FoodView extends Activity{
     private ListView listView1,listView2,listView3,listView4;//各个页卡中的ListView
     private Context context;
     private User user;
+    private MenuItem item;
     /**
      * 食物列表
      */
@@ -101,12 +105,44 @@ public class FoodView extends Activity{
                 break;
             case R.id.call_help:
                 break;
+            case R.id.refresh://启动实时更新
+                if(item.getTitle().equals("启动实时更新")){
+                    //启动ServerObserverService服务
+                    Intent serviceIntent = new Intent(FoodView.this, ServerObserverService.class);
+                    startService(serviceIntent);
+                    item.setTitle("停止实时更新");
+                }else
+                {
+                    //// TODO: 2016/6/27 功能应该是向service发送Message信息
+                    Message msg = Message.obtain();
+                    msg.what = 0;
+                    sMessageHandler.sendMessage(msg);
+                    item.setTitle("启动实时更新");
+                }
+
             default:
                 break;
 
         }
         return super.onOptionsItemSelected(item);
     }
+
+    List<FoodsOnService> mFoodOnService;
+    public Handler sMessageHandler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            if(msg.what == 10){
+                //解析Message携带的菜品信息,更新菜项信息
+                mFoodOnService = (List<FoodsOnService>) msg.obj;
+                /**
+                * 为ListView添加适配器
+                */
+                ListViewAdapter listViewAdapter = new ListViewAdapter(getBaseContext(),mFoodOnService,onClickListener);
+                listView1.setAdapter(listViewAdapter);
+                listView1.setOnItemClickListener(onItemClickListener);
+            }
+        }
+    };
 
     /**
      * ActionBar 中的菜单
@@ -117,6 +153,8 @@ public class FoodView extends Activity{
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main, menu);
+        item = menu.findItem(R.id.refresh);
+
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -140,13 +178,13 @@ public class FoodView extends Activity{
         views.add(view2);
         views.add(view3);
         views.add(view4);
-        /**
-         * 为ListView添加适配器
-         */
 
-        ListViewAdapter listViewAdapter = new ListViewAdapter(getBaseContext(),mFoodItems,onClickListener);
-        listView1.setAdapter(listViewAdapter);
-        listView1.setOnItemClickListener(onItemClickListener);
+//        /**
+//         * 为ListView添加适配器
+//         */
+//        ListViewAdapter listViewAdapter = new ListViewAdapter(getBaseContext(),mFoodItems,onClickListener);
+//        listView1.setAdapter(listViewAdapter);
+//        listView1.setOnItemClickListener(onItemClickListener);
 
         viewPager.setAdapter(new MyViewPagerAdapter(views));
         viewPager.setCurrentItem(0);
@@ -192,13 +230,13 @@ public class FoodView extends Activity{
         /**
          * 食物列表
          */
-        private List<FoodItem>  mFoodItems = new ArrayList<FoodItem>();
+        private List<FoodsOnService>  mFoodItems = new ArrayList<>();
 
         private View.OnClickListener onClickListener;
 
         private LayoutInflater mInflater;
 
-        public ListViewAdapter(Context con, List<FoodItem> mFoodItems, View.OnClickListener onClickListener){
+        public ListViewAdapter(Context con, List<FoodsOnService> mFoodItems, View.OnClickListener onClickListener){
             this.context = con;
             this.mFoodItems = mFoodItems;
             this.onClickListener = onClickListener;
@@ -229,15 +267,17 @@ public class FoodView extends Activity{
                 viewHolder.nameTv = (TextView)view.findViewById(R.id.food_name);
                 viewHolder.priceTv = (TextView) view.findViewById(R.id.food_price);
                 viewHolder.orderBtn = (Button)view.findViewById(R.id.order_btn);
+                viewHolder.foodNumber = (TextView)view.findViewById(R.id.food_num);
                 view.setTag(viewHolder);
             }else{
                 viewHolder = (ViewHolder)view.getTag();
             }
 
-            FoodItem foodItem = mFoodItems.get(i);
+            FoodsOnService foodItem = mFoodItems.get(i);
             if(foodItem != null){
-                viewHolder.nameTv.setText(foodItem.foodName);
-                viewHolder.priceTv.setText(foodItem.foodPrice);
+                viewHolder.nameTv.setText(foodItem.getFoodName());
+                viewHolder.priceTv.setText(foodItem.getFoodPrice());
+                viewHolder.foodNumber.setText(foodItem.getFoodPrice());
                 viewHolder.orderBtn.setTag(i);
                 viewHolder.orderBtn.setOnClickListener(this.onClickListener);
             }
@@ -248,6 +288,7 @@ public class FoodView extends Activity{
             TextView nameTv;
             TextView priceTv;
             Button orderBtn;
+             TextView foodNumber;//库存
         }
 
     }

@@ -54,6 +54,20 @@
             >
 
         </activity>
+        <service android:name="es.source.code.service.ServerObserverService"
+            android:process="es.source.code.observerservice">
+
+        </service>
+        <service android:name="es.source.code.service.UpdateService">
+
+        </service>
+        <receiver android:name="es.source.code.br.DeviceStartedListener">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED">
+
+                </action>
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

@@ -14,5 +14,9 @@
        android:title="呼叫服务"
        android:id="@+id/call_help"
        app:showAsAction="always"/>
+   <item
+      android:title="启动实时更新"
+      android:id="@+id/refresh"
+       app:showAsAction="always"/>
 
 </menu>

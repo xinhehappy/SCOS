@@ -21,6 +21,15 @@
             android:layout_gravity="center_vertical"
             android:id="@+id/food_price"
             android:layout_marginLeft="30dp"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#FF1B2EAC"
+        android:textStyle="bold"
+        android:text="库存"
+        android:layout_gravity="center_vertical"
+        android:id="@+id/food_num"
+        android:layout_marginLeft="30dp"/>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
