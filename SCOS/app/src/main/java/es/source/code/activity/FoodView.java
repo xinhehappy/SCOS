@@ -1,16 +1,22 @@
 package es.source.code.activity;
 
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Message;
+import android.os.Messenger;
+import android.os.RemoteException;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -52,24 +58,26 @@ public class FoodView extends Activity{
     /**
      * 食物列表
      */
-    private List<FoodItem>  mFoodItems = new ArrayList<FoodItem>();
+    private List<FoodsOnService>  mFoodItems = new ArrayList<>();
 
 
     /**
      * 初始化食物列表
      */
     public void initFood(){
-        /**
-         * 测试数据，自定义一些食物。
-         */
-        String foodNames[] = {"苹果","香蕉","葡萄","猕猴桃","荔枝"};
-        String foodPrices[] = {"12","13","14","15","16"};
-        for(int i = 0; i < foodNames.length;i++){
-            FoodItem item = new FoodItem();
-            item.foodName = foodNames[i];
-            item.foodPrice = foodPrices[i];
-            mFoodItems.add(item);
-        }
+//        /**
+//         * 测试数据，自定义一些食物。
+//         */
+//        String foodNames[] = {"苹果","香蕉","葡萄","猕猴桃","荔枝"};
+//        String foodPrices[] = {"12","13","14","15","16"};
+//        for(int i = 0; i < foodNames.length;i++){
+//            FoodItem item = new FoodItem();
+//            item.foodName = foodNames[i];
+//            item.foodPrice = foodPrices[i];
+//            mFoodItems.add(item);
+//        }
+
+
     }
 
     @Override
@@ -106,19 +114,33 @@ public class FoodView extends Activity{
             case R.id.call_help:
                 break;
             case R.id.refresh://启动实时更新
-                if(item.getTitle().equals("启动实时更新")){
-                    //启动ServerObserverService服务
-                    Intent serviceIntent = new Intent(FoodView.this, ServerObserverService.class);
-                    startService(serviceIntent);
-                    item.setTitle("停止实时更新");
-                }else
-                {
-                    //// TODO: 2016/6/27 功能应该是向service发送Message信息
-                    Message msg = Message.obtain();
-                    msg.what = 0;
-                    sMessageHandler.sendMessage(msg);
-                    item.setTitle("启动实时更新");
+                if(isServiceBound){
+                    if(serverMsger != null){
+                        if(item.getTitle().equals("启动实时更新")){
+                            //启动ServerObserverService服务
+                            Intent serviceIntent = new Intent(FoodView.this, ServerObserverService.class);
+                            bindService(serviceIntent,serviceConnection,Context.BIND_AUTO_CREATE);
+                            Message msg = new Message();
+                            msg.what = 1;
+                            msg.replyTo = clientMsger;
+                            try{
+                                serverMsger.send(msg);
+                            }catch (RemoteException e){
+                                e.printStackTrace();
+                            }
+
+                            item.setTitle("停止实时更新");
+                        }else
+                        {
+                            //// TODO: 2016/6/27 功能应该是向service发送Message信息
+                            Message msg = Message.obtain();
+                            msg.what = 0;
+                            sMessageHandler.sendMessage(msg);
+                            item.setTitle("启动实时更新");
+                        }
+                    }
                 }
+                break;
 
             default:
                 break;
@@ -127,22 +149,40 @@ public class FoodView extends Activity{
         return super.onOptionsItemSelected(item);
     }
 
+
+    private boolean isServiceBound;
+    private Messenger serverMsger;
+    //创建Service连接
+    private ServiceConnection serviceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            Log.w("component name:", componentName.getClassName());
+            serverMsger = new Messenger(iBinder);
+            isServiceBound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+            serverMsger = null;
+            isServiceBound = false;
+        }
+    };
     List<FoodsOnService> mFoodOnService;
-    public Handler sMessageHandler = new Handler(){
+
+
+    private Handler sMessageHandler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
             if(msg.what == 10){
                 //解析Message携带的菜品信息,更新菜项信息
                 mFoodOnService = (List<FoodsOnService>) msg.obj;
-                /**
-                * 为ListView添加适配器
-                */
                 ListViewAdapter listViewAdapter = new ListViewAdapter(getBaseContext(),mFoodOnService,onClickListener);
                 listView1.setAdapter(listViewAdapter);
                 listView1.setOnItemClickListener(onItemClickListener);
             }
         }
     };
+    private Messenger clientMsger = new Messenger(sMessageHandler);
 
     /**
      * ActionBar 中的菜单
@@ -182,9 +222,9 @@ public class FoodView extends Activity{
 //        /**
 //         * 为ListView添加适配器
 //         */
-//        ListViewAdapter listViewAdapter = new ListViewAdapter(getBaseContext(),mFoodItems,onClickListener);
-//        listView1.setAdapter(listViewAdapter);
-//        listView1.setOnItemClickListener(onItemClickListener);
+        ListViewAdapter listViewAdapter = new ListViewAdapter(getBaseContext(),mFoodItems,onClickListener);
+        listView1.setAdapter(listViewAdapter);
+        listView1.setOnItemClickListener(onItemClickListener);
 
         viewPager.setAdapter(new MyViewPagerAdapter(views));
         viewPager.setCurrentItem(0);

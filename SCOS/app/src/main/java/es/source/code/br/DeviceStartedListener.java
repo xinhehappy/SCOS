@@ -8,6 +8,7 @@ import android.util.Log;
 import es.source.code.service.UpdateService;
 
 /**
+ *
  * Created by adam on 2016/6/27.
  */
 public class DeviceStartedListener extends BroadcastReceiver{
