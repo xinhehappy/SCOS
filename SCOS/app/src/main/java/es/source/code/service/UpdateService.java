@@ -47,12 +47,10 @@ public class UpdateService extends IntentService {
             FoodsOnService foodItem = mFoodOnService.get(0);
             CharSequence contentText = "新品上架:"+mFoodOnService.get(0).getFoodName()
                     +"价格："+mFoodOnService.get(0).getFoodPrice()+"类型："+mFoodOnService.get(0).getType();
-
             Intent notificationIntent = new Intent(getBaseContext(), FoodDetailed.class);
             Bundle bundle = new Bundle();
             bundle.putSerializable("newFood",foodItem);
             notificationIntent.putExtras(bundle);
-
 
             PendingIntent contentIntent = PendingIntent.getActivity(getBaseContext(),0,notificationIntent,0);
             Notification.Builder builder= new Notification.Builder(getBaseContext());
