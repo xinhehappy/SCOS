@@ -13,11 +13,20 @@ import es.source.code.service.UpdateService;
  */
 public class DeviceStartedListener extends BroadcastReceiver{
    private static final String ACTION_BOOT = "android.intent.action.BOOT_COMPLETED";
+   private static final String ACTION_USER= "android.intent.action.USER_PRESENT";
    private static final String TAG = "DeviceStartedListener";
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.i(TAG,"Boot this system,DeviceStartedListener onReceive()");
+
         if(intent.getAction().equals(ACTION_BOOT)){
+            Log.w("DeviceStartedListener","action boot");
+            //启动UpdateService服务
+            Intent updateServiceIntent = new Intent(context, UpdateService.class);
+            context.startService(updateServiceIntent);
+        }
+        if(intent.getAction().equals(ACTION_USER)){
+            Log.w("USER_CURRENT","action boot");
             //启动UpdateService服务
             Intent updateServiceIntent = new Intent(context, UpdateService.class);
             context.startService(updateServiceIntent);

@@ -114,13 +114,31 @@ public class FoodView extends Activity{
             case R.id.call_help:
                 break;
             case R.id.refresh://启动实时更新
-                if(isServiceBound){
-                    if(serverMsger != null){
                         if(item.getTitle().equals("启动实时更新")){
                             //启动ServerObserverService服务
                             Intent serviceIntent = new Intent(FoodView.this, ServerObserverService.class);
                             bindService(serviceIntent,serviceConnection,Context.BIND_AUTO_CREATE);
+                            /**
+                             * 绑定Service服务后不可以直接进行传递Message。因为severMsger为空。
+                             */
+                            item.setTitle("停止实时更新");
+//                            Message msg = new Message();
+//                            Bundle data = new Bundle();
+//                            data.putString("send","from client");
+//                            msg.setData(data);
+//                            msg.what = 1;
+//                            msg.replyTo = clientMsger;
+//                            try{
+//                                serverMsger.send(msg);
+//                            }catch (RemoteException e){
+//                                e.printStackTrace();
+//                            }
+                        }else
+                        {
                             Message msg = new Message();
+                            Bundle data = new Bundle();
+                            data.putString("send","from client");
+                            msg.setData(data);
                             msg.what = 1;
                             msg.replyTo = clientMsger;
                             try{
@@ -129,17 +147,12 @@ public class FoodView extends Activity{
                                 e.printStackTrace();
                             }
 
-                            item.setTitle("停止实时更新");
-                        }else
-                        {
-                            //// TODO: 2016/6/27 功能应该是向service发送Message信息
-                            Message msg = Message.obtain();
-                            msg.what = 0;
-                            sMessageHandler.sendMessage(msg);
+//                            //// TODO: 2016/6/27 功能应该是向service发送Message信息
+//                            Message msg = Message.obtain();
+//                            msg.what = 0;
+//                            sMessageHandler.sendMessage(msg);
                             item.setTitle("启动实时更新");
                         }
-                    }
-                }
                 break;
 
             default:
@@ -150,7 +163,7 @@ public class FoodView extends Activity{
     }
 
 
-    private boolean isServiceBound;
+    private boolean isServiceBound = false;
     private Messenger serverMsger;
     //创建Service连接
     private ServiceConnection serviceConnection = new ServiceConnection() {
@@ -173,13 +186,16 @@ public class FoodView extends Activity{
     private Handler sMessageHandler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
+//            Toast.makeText(getApplicationContext(),msg.getData().getString("reply"),Toast.LENGTH_LONG).show();
             if(msg.what == 10){
                 //解析Message携带的菜品信息,更新菜项信息
-                mFoodOnService = (List<FoodsOnService>) msg.obj;
+                mFoodOnService = (List<FoodsOnService>) msg.getData().getSerializable("foods");
                 ListViewAdapter listViewAdapter = new ListViewAdapter(getBaseContext(),mFoodOnService,onClickListener);
                 listView1.setAdapter(listViewAdapter);
                 listView1.setOnItemClickListener(onItemClickListener);
+                Toast.makeText(getApplicationContext(),"从服务器更新菜品成功",Toast.LENGTH_LONG).show();
             }
+
         }
     };
     private Messenger clientMsger = new Messenger(sMessageHandler);
@@ -222,9 +238,9 @@ public class FoodView extends Activity{
 //        /**
 //         * 为ListView添加适配器
 //         */
-        ListViewAdapter listViewAdapter = new ListViewAdapter(getBaseContext(),mFoodItems,onClickListener);
-        listView1.setAdapter(listViewAdapter);
-        listView1.setOnItemClickListener(onItemClickListener);
+//        ListViewAdapter listViewAdapter = new ListViewAdapter(getBaseContext(),mFoodItems,onClickListener);
+//        listView1.setAdapter(listViewAdapter);
+//        listView1.setOnItemClickListener(onItemClickListener);
 
         viewPager.setAdapter(new MyViewPagerAdapter(views));
         viewPager.setCurrentItem(0);
@@ -255,7 +271,7 @@ public class FoodView extends Activity{
             // TODO: 2016/6/23 进入 菜品详情页面
             Intent intent = new Intent(FoodView.this,FoodDetailed.class);
             Bundle bundle = new Bundle();
-            bundle.putSerializable("foodsitem",mFoodItems.get(i).foodName);
+            bundle.putSerializable("foodsitem",mFoodOnService.get(i).foodName);
             intent.putExtras(bundle);
             FoodView.this.startActivity(intent);
 
@@ -316,8 +332,8 @@ public class FoodView extends Activity{
             FoodsOnService foodItem = mFoodItems.get(i);
             if(foodItem != null){
                 viewHolder.nameTv.setText(foodItem.getFoodName());
-                viewHolder.priceTv.setText(foodItem.getFoodPrice());
-                viewHolder.foodNumber.setText(foodItem.getFoodPrice());
+                viewHolder.priceTv.setText("价格："+foodItem.getFoodPrice());
+                viewHolder.foodNumber.setText("库存："+foodItem.getFoodNum());
                 viewHolder.orderBtn.setTag(i);
                 viewHolder.orderBtn.setOnClickListener(this.onClickListener);
             }

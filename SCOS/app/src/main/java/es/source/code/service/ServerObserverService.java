@@ -4,13 +4,16 @@ import android.app.ActivityManager;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +25,7 @@ import es.source.code.activity.FoodsOnService;
 public class ServerObserverService extends Service{
     @Override
     public void onCreate() {
+        Log.w("ServerObserverService","onCreate");
         super.onCreate();
         for(int i=0 ;  i<10;i++){
             FoodsOnService item = new FoodsOnService();
@@ -37,6 +41,7 @@ public class ServerObserverService extends Service{
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
+        Log.w("ServerObserverService","绑定Service");
         return serverMsger.getBinder();
     }
 
@@ -46,10 +51,25 @@ public class ServerObserverService extends Service{
             switch (msg.what){
                 case 0:
                     //关闭模拟任务的线程
-
                     break;
                 case 1:
-                    new Thread(new MyThread(msg)).start();
+                    try{
+                        Thread.sleep(300);
+                    }catch (InterruptedException e){
+                        e.printStackTrace();
+                    }
+                    Message replayMsg =  new Message();
+                    Bundle data = new Bundle();
+                    data.putSerializable("foods", (Serializable)mFoodOnService);
+                    data.putString("reply",msg.getData().getString("send")+"form service");
+                    replayMsg.setData(data);
+                    replayMsg.what = 10;
+                    try{
+                        msg.replyTo.send(replayMsg);
+                    }catch (RemoteException e){
+                        e.printStackTrace();
+                    }
+//                    new Thread(new MyThread(msg)).start();
                     break;
                 case 10:
                     break;
@@ -78,7 +98,7 @@ public class ServerObserverService extends Service{
                     Thread.sleep(300);
                     if(mFoodOnService != null){//接收到新数据
                         ActivityManager activityManager = (ActivityManager) ServerObserverService.this.getSystemService(Context.ACTIVITY_SERVICE);
-                        List<ActivityManager.RunningTaskInfo> list = activityManager.getRunningTasks(100);
+                        List<ActivityManager.RunningTaskInfo> list = activityManager.getRunningTasks(1);
                         for(ActivityManager.RunningTaskInfo info:list){
                             if(info.baseActivity.getPackageName().equals(MY_PKG_NAME)){
                                 //SCOS应用正在运行

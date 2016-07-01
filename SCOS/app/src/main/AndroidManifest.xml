@@ -6,6 +6,7 @@
     >
     <uses-permission android:name="android.permission.CALL_PHONE"></uses-permission>
     <uses-permission android:name="android.permission.SEND_SMS"></uses-permission>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"></uses-permission>
     <permission
         android:name="scos.permission.ACCESSSCOS"
         android:protectionLevel="dangerous">
@@ -64,6 +65,11 @@
         <receiver android:name="es.source.code.br.DeviceStartedListener">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED">
+
+                </action>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.USER_PRESENT">
 
                 </action>
             </intent-filter>

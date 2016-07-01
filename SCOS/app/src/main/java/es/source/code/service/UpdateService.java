@@ -45,7 +45,8 @@ public class UpdateService extends IntentService {
             Context context = getApplicationContext();
             CharSequence contentTitle = "notification";
             FoodsOnService foodItem = mFoodOnService.get(0);
-            CharSequence contentText = "新品上架:"+mFoodOnService.get(0).getFoodName()+mFoodOnService.get(0).getFoodPrice()+mFoodOnService.get(0).getType();
+            CharSequence contentText = "新品上架:"+mFoodOnService.get(0).getFoodName()
+                    +"价格："+mFoodOnService.get(0).getFoodPrice()+"类型："+mFoodOnService.get(0).getType();
 
             Intent notificationIntent = new Intent(getBaseContext(), FoodDetailed.class);
             Bundle bundle = new Bundle();
@@ -62,7 +63,7 @@ public class UpdateService extends IntentService {
             builder.setSmallIcon(icon);
             builder.setContentTitle(contentTitle);
             builder.setOngoing(true);
-            builder.setNumber(100);
+//            builder.setNumber(100);
 //            builder.build();
             notification = builder.getNotification();
             notificationManager.notify(11,notification);
